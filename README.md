@@ -25,10 +25,11 @@ pytorch==1.11.0
 pytorch3d==0.7.2
 langchain==0.2.1
 vllm
+```
 1. Locally Deploying the LLM (via vLLM)
 We use vllm to host the open-source Qwen model locally, eliminating external API dependencies. Start the local inference server with the following command:
 code
-Bash
+```Bash
 python -m vllm.entrypoints.openai.api_server \
   --model Qwen/Qwen3-32B-AWQ \
   --gpu-memory-utilization 0.98 \
@@ -36,11 +37,12 @@ python -m vllm.entrypoints.openai.api_server \
   --max-num-seqs 1 \
   --enforce-eager \
   --port 8000
+```
 2. Zero-Shot Evaluation on ScanRefer
 Step 2.1: Generate Query Programs
 Generate the parsed queries and structured programs using the locally hosted LLM:
 code
-Bash
+```Bash
 python generate_scanrefer_baseline.py \
   --scanrefer_path data/scanrefer_val.json \
   --prompt_path prompts/prompt_n32_gemma.txt \
@@ -48,21 +50,24 @@ python generate_scanrefer_baseline.py \
   --llm_url http://127.0.0.1:8000/v1 \
   --llm_model google/gemma-4-E2B-it \
   --resume
+```
 Step 2.2: Run Grounding Evaluation
 Evaluate the generated programs and output the performance metrics:
 code
-Bash
+```Bash
 python llm_grounding_scanrefer_test.py
+```
 3. Zero-Shot Evaluation on Nr3D
 Step 3.1: Generate Query Programs
 Generate parsed query programs for the Nr3D dataset:
 code
-Bash
+```Bash
 python gen_visprogapple.py
+```
 Step 3.2: Run Grounding Evaluation
 Run the grounding evaluation script directly to compute final results:
 code
-Bash
+```Bash
 python3 -c "
 from zsvg.llm_grounding import run_llm_grounding_eval
 run_llm_grounding_eval(
@@ -70,11 +75,8 @@ run_llm_grounding_eval(
     exp_name='llm_grounding_feats_20',
 )
 "
+```
 Data Preparation
 Please refer to the dataset configuration files to preprocess the ScanNet 3D scans, 2D images, and instance masks, ensuring they are placed in the data/ directory before running the scripts.
 code
 Code
-### 修改点说明：
-1. **标题与摘要更新**：将原论文的视觉编程（Visual Programming）标题，更新为了更契合您方法论的 `Geometry-Aware Zero-shot 3D Instance Segmentation and Visual Grounding`。并将正文介绍替换为您最新拟定的三个创新点（LLM查询分割、Row-by-Row表格化评估、坐标与距离几何化处理）和 38.9% 准确率的结论。
-2. **去除了无关旧步骤**：删除了原版 ZSVG3D 中依赖微软 OneDrive/SharePoint 链接、BLIP2 图像裁剪模块等复杂且不再使用的配置。
-3. **工作流模块化**：将操作指南分为了 **vLLM部署**、**ScanRefer流**、**Nr3D流** 三个直观的主步骤，方便协作者直接复制命令运行。
